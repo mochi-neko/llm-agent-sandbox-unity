@@ -1,13 +1,67 @@
 {
   "dependencies": {
-    "com.unity.collab-proxy": {
-      "version": "1.15.15",
+    "com.boundfoxstudios.fluentassertions": {
+      "version": "https://github.com/BoundfoxStudios/fluentassertions-unity.git#upm",
       "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.services.core": "1.0.1"
-      },
-      "url": "https://packages.unity.com"
+      "source": "git",
+      "dependencies": {},
+      "hash": "ac405b32a618bf9d9880e4fc1b63c5e45036c72c"
+    },
+    "com.cysharp.unitask": {
+      "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "73d86259ce31ce7f4dfe1d028ea1c3edf96c23e4"
+    },
+    "com.mochineko.chatgpt-api": {
+      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API#0.2.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d88d509f2c048bf1f1ce81e0ae0811794324de67"
+    },
+    "com.mochineko.chatgpt-api.relent": {
+      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API.Relent#0.2.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d88d509f2c048bf1f1ce81e0ae0811794324de67"
+    },
+    "com.mochineko.relent.resilience": {
+      "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent/Resilience#0.1.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "be1ce8085b9341ba8b068569ea49fe5f8125b9ab"
+    },
+    "com.mochineko.relent.uncertain-result": {
+      "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent/UncertainResult#0.1.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "be1ce8085b9341ba8b068569ea49fe5f8125b9ab"
+    },
+    "com.mochineko.simple-audio-codec-unity": {
+      "version": "https://github.com/mochi-neko/simple-audio-codec-unity.git?path=/Assets/Mochineko/SimpleAudioCodec#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "fb76f048a78ef9fa4e0d00df6f184d1b7a64042b"
+    },
+    "com.naudio.core": {
+      "version": "https://github.com/mochi-neko/simple-audio-codec-unity.git?path=/Assets/NAudio/NAudio.Core#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "fb76f048a78ef9fa4e0d00df6f184d1b7a64042b"
+    },
+    "com.neuecc.unirx": {
+      "version": "https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "284d5c50d3f1ddd9fa7df3d382ea904732a9c2ff"
     },
     "com.unity.editorcoroutines": {
       "version": "1.0.0",
@@ -17,7 +71,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ext.nunit": {
-      "version": "1.0.6",
+      "version": "2.0.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -38,7 +92,7 @@
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.13",
+      "version": "3.0.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -47,7 +101,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.14",
+      "version": "2.0.17",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -62,20 +116,18 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.0.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.performance.profile-analyzer": {
       "version": "1.1.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.services.core": {
-      "version": "1.0.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.unitywebrequest": "1.0.0"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.settings-manager": {
@@ -86,11 +138,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.31",
+      "version": "2.0.1-pre.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.ext.nunit": "1.0.6",
+        "com.unity.ext.nunit": "2.0.2",
         "com.unity.modules.imgui": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       },
@@ -135,16 +187,6 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
-    },
-    "com.unity.visualscripting": {
-      "version": "1.7.6",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

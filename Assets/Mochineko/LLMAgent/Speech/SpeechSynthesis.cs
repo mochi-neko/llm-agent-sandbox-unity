@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -8,7 +7,6 @@ using Mochineko.KoeiromapAPI;
 using Mochineko.Relent.Resilience;
 using Mochineko.Relent.Result;
 using Mochineko.Relent.UncertainResult;
-using Mochineko.SimpleAudioCodec;
 using UnityEngine;
 
 namespace Mochineko.LLMAgent.Speech
@@ -53,20 +51,27 @@ namespace Mochineko.LLMAgent.Speech
 
             if (synthesisResult is IUncertainSuccessResult<Stream> success)
             {
-                try
-                {
-                    var audioClip = await WaveDecoder.DecodeByBlockAsync(
-                        success.Result,
-                        fileName: "KoeiromapSynthesized.wav",
-                        cancellationToken);
+                Debug.Log($"[LLMAgent.Speech] Begin to decode audio:{text}.");
 
-                    Debug.Log($"[LLMAgent.Speech] Succeeded to synthesis speech from text:{text}.");
-                    return ResultFactory.Succeed(audioClip);
-                }
-                catch (Exception exception)
+                var decodeResult = await AudioDecoder.DecodeAsync(
+                    success.Result,
+                    fileName: "KoeiromapSynthesized.wav",
+                    cancellationToken);
+
+                if (decodeResult is ISuccessResult<AudioClip> decodeSuccess)
                 {
+                    Debug.Log($"[LLMAgent.Speech] Succeeded to synthesis speech from text:{text}.");
+                    return ResultFactory.Succeed(decodeSuccess.Result);
+                }
+                else if (decodeResult is IFailureResult<AudioClip> decodeFailure)
+                {
+                    Debug.LogError($"[LLMAgent.Speech] Failed to decode audio stream because -> {decodeFailure.Message}.");
                     return ResultFactory.Fail<AudioClip>(
-                        $"Failed to decode audio stream because -> {exception}.");
+                        $"Failed to decode audio stream because -> {decodeFailure.Message}.");
+                }
+                else
+                {
+                    throw new ResultPatternMatchException(nameof(decodeResult));
                 }
             }
             else if (synthesisResult is IUncertainRetryableResult<Stream> retryable)

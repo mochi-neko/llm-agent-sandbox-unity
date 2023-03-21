@@ -1,3 +1,5 @@
+#nullable enable
+using System;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -13,14 +15,14 @@ namespace Mochineko.LLMAgent.Operation
 {
     internal sealed class DemoOperator : MonoBehaviour
     {
-        [SerializeField, TextArea] private string prompt;
-        [SerializeField, TextArea] private string message;
+        [SerializeField, TextArea] private string prompt = string.Empty;
+        [SerializeField, TextArea] private string message = string.Empty;
         [SerializeField, Range(-3f, 3f)] private float speakerX;
         [SerializeField, Range(-3f, 3f)] private float speakerY;
-        [SerializeField] private SpeechQueue speechQueue;
+        [SerializeField] private SpeechQueue? speechQueue;
 
-        private ChatCompletion chatCompletion;
-        private SpeechSynthesis speechSynthesis;
+        private ChatCompletion? chatCompletion;
+        private SpeechSynthesis? speechSynthesis;
 
         private void Awake()
         {
@@ -54,6 +56,21 @@ namespace Mochineko.LLMAgent.Operation
 
         private async UniTask ChatAsync(string message, CancellationToken cancellationToken)
         {
+            if (chatCompletion == null)
+            {
+                throw new NullReferenceException(nameof(chatCompletion));
+            }
+
+            if (speechSynthesis == null)
+            {
+                throw new NullReferenceException(nameof(speechSynthesis));
+            }
+
+            if (speechQueue == null)
+            {
+                throw new NullReferenceException(nameof(speechQueue));
+            }
+
             var chatResult = await chatCompletion.CompleteChatAsync(message, cancellationToken);
             if (chatResult is ISuccessResult<string> chatSuccess)
             {
@@ -62,6 +79,7 @@ namespace Mochineko.LLMAgent.Operation
                     chatSuccess.Result,
                     Style.Talk,
                     cancellationToken);
+
                 if (synthesisResult is ISuccessResult<AudioClip> synthesisSuccess)
                 {
                     speechQueue.Enqueue(synthesisSuccess.Result);

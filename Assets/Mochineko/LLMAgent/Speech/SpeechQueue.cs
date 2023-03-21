@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Concurrent;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -7,7 +8,7 @@ namespace Mochineko.LLMAgent.Speech
 {
     public sealed class SpeechQueue : MonoBehaviour
     {
-        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioSource? audioSource = null;
 
         private readonly ConcurrentQueue<AudioClip> queue = new();
 
@@ -16,6 +17,10 @@ namespace Mochineko.LLMAgent.Speech
         private void Awake()
         {
             Assert.IsNotNull(audioSource);
+            if (audioSource == null)
+            {
+                throw new NullReferenceException(nameof(audioSource));
+            }
 
             audioSource.loop = false;
         }

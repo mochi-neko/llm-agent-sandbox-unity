@@ -1,12 +1,12 @@
 #nullable enable
 using System.Net.Http;
 
-namespace Mochineko.LLMAgent.Speech
+namespace Mochineko.LLMAgent.Operation
 {
     /// <summary>
     /// Pools <see cref="HttpClient"/> to save socket.
     /// </summary>
-    public static class HttpClientPool
+    internal static class HttpClientPool
     {
         private static HttpClient pooledClient;
         /// <summary>

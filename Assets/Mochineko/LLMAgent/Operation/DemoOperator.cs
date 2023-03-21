@@ -17,14 +17,14 @@ namespace Mochineko.LLMAgent.Operation
         [SerializeField, TextArea] private string message;
         [SerializeField, Range(-3f, 3f)] private float speakerX;
         [SerializeField, Range(-3f, 3f)] private float speakerY;
-        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private SpeechQueue speechQueue;
 
         private ChatCompletion chatCompletion;
         private SpeechSynthesis speechSynthesis;
 
         private void Awake()
         {
-            Assert.IsNotNull(audioSource);
+            Assert.IsNotNull(speechQueue);
         }
 
         private void Start()
@@ -54,17 +54,17 @@ namespace Mochineko.LLMAgent.Operation
 
         private async UniTask ChatAsync(string message, CancellationToken cancellationToken)
         {
-            var chatResult = await chatCompletion.SendChatAsync(message, cancellationToken);
+            var chatResult = await chatCompletion.CompleteChatAsync(message, cancellationToken);
             if (chatResult is ISuccessResult<string> chatSuccess)
             {
-                var synthesisResult = await speechSynthesis.SynthesisAsync(
+                var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
+                    HttpClientPool.PooledClient,
                     chatSuccess.Result,
                     Style.Talk,
                     cancellationToken);
                 if (synthesisResult is ISuccessResult<AudioClip> synthesisSuccess)
                 {
-                    // TODO: Queueing
-                    audioSource.PlayOneShot(synthesisSuccess.Result);
+                    speechQueue.Enqueue(synthesisSuccess.Result);
                 }
                 else
                 {

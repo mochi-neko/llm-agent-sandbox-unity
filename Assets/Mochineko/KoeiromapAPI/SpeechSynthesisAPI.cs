@@ -23,7 +23,7 @@ namespace Mochineko.KoeiromapAPI
             float? speakerX = null,
             float? speakerY = null,
             Style? style = null,
-            long? seed = null)
+            ulong? seed = null)
         {
             if (string.IsNullOrEmpty(text))
             {

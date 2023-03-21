@@ -41,10 +41,12 @@ namespace Mochineko.LLMAgent.Chat
             memory.ClearAllMessages();
         }
         
-        public async UniTask<IResult<string>> SendChatAsync(
+        public async UniTask<IResult<string>> CompleteChatAsync(
             string message,
             CancellationToken cancellationToken)
         {
+            Debug.Log($"[LLMAgent.Chat] Begin to complete chat with message:{message}.");
+            
             await UniTask.SwitchToThreadPool();
 
             var result = await policy.ExecuteAsync(

@@ -42,14 +42,14 @@ namespace Mochineko.KoeiromapAPI
         /// Defaults to null.
         /// </summary>
         [JsonProperty("seed")]
-        public long? Seed { get; }
+        public ulong? Seed { get; }
 
         public RequestBody(
             string text,
             float? speakerX = null,
             float? speakerY = null,
             Style? style = null,
-            long? seed = null)
+            ulong? seed = null)
         {
             Text = text;
             SpeakerX = speakerX;

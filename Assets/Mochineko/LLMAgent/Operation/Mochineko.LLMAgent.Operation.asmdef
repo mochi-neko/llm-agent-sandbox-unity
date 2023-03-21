@@ -1,0 +1,21 @@
+{
+    "name": "Mochineko.LLMAgent.Operation",
+    "rootNamespace": "",
+    "references": [
+        "GUID:3ed995982eec04b2e9d304b5b6242945",
+        "GUID:f97622f31fca64cc0985579f2e6cbc6a",
+        "GUID:ae7451b9295a249629bddb7d0555a9a0",
+        "GUID:d63d7a0555b6b4b0a9148c0dbfcd7265",
+        "GUID:482d9b13fc9b2456a8fc0984abb0c8a3",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

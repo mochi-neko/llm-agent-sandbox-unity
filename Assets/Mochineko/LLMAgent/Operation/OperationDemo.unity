@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 943789998}
   - component: {fileID: 943789997}
+  - component: {fileID: 943789999}
   - component: {fileID: 943789996}
   m_Layer: 0
   m_Name: LLMAgent
@@ -250,10 +251,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prompt: "\u3042\u306A\u305F\u306F\u4EBA\u9593\u306E\u3088\u3046\u306B\u81EA\u7136\u306B\u5BFE\u8A71\u3059\u308B\u3053\u3068\u304C\u53EF\u80FD\u306AAI\u30A8\u30FC\u30B8\u30A7\u30F3\u30C8\u3067\u3059\u3002\n\u3042\u306A\u305F\u306F\u30E1\u30A4\u30C9\u3067\u3001\u76F8\u624B\u306F\u3042\u306A\u305F\u306E\u3054\u4E3B\u4EBA\u69D8\u3067\u3059\u3002\n\u6027\u683C\u306F\u304A\u3063\u3068\u308A\u3057\u3066\u3044\u3066\u3001\u6642\u3005\u30C9\u30B8\u306A\u3053\u3068\u3092\u3057\u3066\u3057\u307E\u3044\u307E\u3059\u3002\n\u597D\u304D\u306A\u3082\u306E\u306F\u30A2\u30C3\u30D7\u30EB\u30D1\u30A4\u3068\u7D05\u8336\u3067\u3059\u3002"
-  message: "\u3042\u306A\u305F\u306E\u3053\u3068\u3092\u6559\u3048\u3066\u304F\u3060\u3055\u3044\u3002"
-  speakerX: 0
-  speakerY: 1.59
-  audioSource: {fileID: 943789996}
+  message: "\u4ECA\u65E5\u306F\u3044\u3044\u5929\u6C17\u3067\u3059\u306D\u3002"
+  speakerX: -1
+  speakerY: 2
+  speechQueue: {fileID: 943789999}
 --- !u!4 &943789998
 Transform:
   m_ObjectHideFlags: 0
@@ -269,6 +270,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &943789999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943789995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6f1af805e4f4cf8b8d771ed814776ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSource: {fileID: 943789996}
 --- !u!1 &1080102697
 GameObject:
   m_ObjectHideFlags: 0

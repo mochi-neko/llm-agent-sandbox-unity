@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Mochineko.ChatGPT_API;
 using Mochineko.KoeiromapAPI;
 using Mochineko.LLMAgent.Chat;
+using Mochineko.LLMAgent.Emotion;
 using Mochineko.LLMAgent.Speech;
 using Mochineko.Relent.Result;
 using UnityEngine;
@@ -40,7 +41,7 @@ namespace Mochineko.LLMAgent.Operation
             chatCompletion = new ChatCompletion(
                 apiKey,
                 Model.Turbo,
-                prompt, // PromptTemplate.ChatAgentTemplate,
+                prompt + ". " + PromptTemplate.ChatAgentEmotionAnalysisTemplate,
                 50);
 
             speechSynthesis = new SpeechSynthesis(
@@ -74,15 +75,31 @@ namespace Mochineko.LLMAgent.Operation
             var chatResult = await chatCompletion.CompleteChatAsync(message, cancellationToken);
             if (chatResult is ISuccessResult<string> chatSuccess)
             {
-                var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
-                    HttpClientPool.PooledClient,
-                    chatSuccess.Result,
-                    Style.Talk,
-                    cancellationToken);
+                Debug.Log($"[LLMAgent.Operation] Emotionalized JSON message:{chatSuccess.Result}.");
 
-                if (synthesisResult is ISuccessResult<AudioClip> synthesisSuccess)
+                var emotionalizationResult = RelentJsonSerializer.Deserialize<EmotionalMessage>(chatSuccess.Result);
+                if (emotionalizationResult is ISuccessResult<EmotionalMessage> emotionalizationSuccess)
                 {
-                    speechQueue.Enqueue(synthesisSuccess.Result);
+                    var emotionStyle = EmotionToStyleConverter.ExcludeHighestEmotionStyle(
+                        emotionalizationSuccess.Result.Emotion,
+                        threshold: 0.5f);
+                    
+                    Debug.Log($"[LLMAgent.Operation] Exclude emotion style: {emotionStyle}.");
+                    
+                    var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
+                        HttpClientPool.PooledClient,
+                        emotionalizationSuccess.Result.Message,
+                        emotionStyle,
+                        cancellationToken);
+                    
+                    if (synthesisResult is ISuccessResult<AudioClip> synthesisSuccess)
+                    {
+                        speechQueue.Enqueue(synthesisSuccess.Result);
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
                 else
                 {

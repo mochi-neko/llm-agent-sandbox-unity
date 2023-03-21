@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using Mochineko.Relent.Result;
 using Newtonsoft.Json;
 
 namespace Mochineko.KoeiromapAPI
@@ -56,73 +54,6 @@ namespace Mochineko.KoeiromapAPI
             SpeakerY = speakerY;
             Style = style?.ToText();
             Seed = seed;
-        }
-
-        public IResult<string> Serialize()
-        {
-            try
-            {
-                var json = JsonConvert.SerializeObject(
-                    this,
-                    Formatting.Indented,
-                    new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
-
-                if (!string.IsNullOrEmpty(json))
-                {
-                    return ResultFactory.Succeed(json);
-                }
-                else
-                {
-                    return ResultFactory.Fail<string>(
-                        $"Failed to serialize because serialized JSON of {nameof(RequestBody)} was null or empty.");
-                }
-            }
-            catch (JsonSerializationException exception)
-            {
-                return ResultFactory.Fail<string>(
-                    $"Failed to serialize {nameof(RequestBody)} to JSON because -> {exception}");
-            }
-            catch (Exception exception)
-            {
-                return ResultFactory.Fail<string>(
-                    $"Failed to serialize {nameof(RequestBody)} to JSON because unhandled exception -> {exception}");
-            }
-        }
-
-        public static IResult<RequestBody> Deserialize(string json)
-        {
-            try
-            {
-                var requestBody = JsonConvert.DeserializeObject<RequestBody>(json);
-
-                if (requestBody != null)
-                {
-                    return ResultFactory.Succeed(requestBody);
-                }
-                else
-                {
-                    return ResultFactory.Fail<RequestBody>(
-                        $"Failed to deserialize because deserialized object of {nameof(RequestBody)} was null.");
-                }
-            }
-            catch (JsonSerializationException exception)
-            {
-                return ResultFactory.Fail<RequestBody>(
-                    $"Failed to deserialize {nameof(RequestBody)} from JSON because -> {exception}");
-            }
-            catch (JsonReaderException exception)
-            {
-                return ResultFactory.Fail<RequestBody>(
-                    $"Failed to deserialize {nameof(RequestBody)} from JSON because -> {exception}");
-            }
-            catch (Exception exception)
-            {
-                return ResultFactory.Fail<RequestBody>(
-                    $"Failed to deserialize {nameof(RequestBody)} from JSON because unhandled exception -> {exception}");
-            }
         }
     }
 }

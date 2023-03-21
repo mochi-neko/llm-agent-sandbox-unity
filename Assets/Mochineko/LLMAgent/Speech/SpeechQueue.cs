@@ -36,6 +36,10 @@ namespace Mochineko.LLMAgent.Speech
 
         private void Update()
         {
+            if (audioSource == null)
+            {
+                throw new NullReferenceException(nameof(audioSource));
+            }
             if (audioSource.isPlaying)
             {
                 return;

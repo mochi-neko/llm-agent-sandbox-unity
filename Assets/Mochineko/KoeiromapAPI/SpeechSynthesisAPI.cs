@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mochineko.Relent.Result;
 using Mochineko.Relent.UncertainResult;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Mochineko.KoeiromapAPI
@@ -47,7 +48,12 @@ namespace Mochineko.KoeiromapAPI
 
             // Serialize request body
             string requestBodyJson;
-            var serializationResult = requestBody.Serialize();
+            var serializationResult = RelentJsonSerializer.Serialize(
+                requestBody,
+                new JsonSerializerSettings()
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                });
             if (serializationResult is ISuccessResult<string> serializationSuccess)
             {
                 requestBodyJson = serializationSuccess.Result;
@@ -99,7 +105,7 @@ namespace Mochineko.KoeiromapAPI
                 if (responseMessage.IsSuccessStatusCode)
                 {
                     // Deserialize response body
-                    var deserializationResult = ResponseBody.Deserialize(responseString);
+                    var deserializationResult = RelentJsonSerializer.Deserialize<ResponseBody>(responseString);
                     if (deserializationResult is ISuccessResult<ResponseBody> deserializationSuccess)
                     {
                         var responseBody = deserializationSuccess.Result;

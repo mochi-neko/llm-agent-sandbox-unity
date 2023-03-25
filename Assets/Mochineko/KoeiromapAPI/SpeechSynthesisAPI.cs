@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Mochineko.Relent.Result;
 using Mochineko.Relent.UncertainResult;
+using Mochineko.RelentJsonSerialization;
 using Newtonsoft.Json;
 using UnityEngine;
 

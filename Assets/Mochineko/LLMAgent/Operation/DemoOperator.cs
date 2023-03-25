@@ -9,6 +9,7 @@ using Mochineko.LLMAgent.Chat;
 using Mochineko.LLMAgent.Emotion;
 using Mochineko.LLMAgent.Speech;
 using Mochineko.Relent.Result;
+using Mochineko.RelentJsonSerialization;
 using UnityEngine;
 using UnityEngine.Assertions;
 

@@ -3,7 +3,7 @@ using System;
 using Mochineko.Relent.Result;
 using Newtonsoft.Json;
 
-namespace Mochineko.KoeiromapAPI
+namespace Mochineko.RelentJsonSerialization
 {
     public static class RelentJsonSerializer
     {

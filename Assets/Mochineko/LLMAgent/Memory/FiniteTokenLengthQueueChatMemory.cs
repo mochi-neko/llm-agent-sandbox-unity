@@ -10,8 +10,11 @@ namespace Mochineko.LLMAgent.Memory
         private readonly int maxTokenLength;
         private readonly TikToken tikToken;
         private readonly Queue<Message> queue = new();
-
-        public FiniteTokenLengthQueueChatMemory(int maxTokenLength, string model = "gpt-3.5-turbo")
+        
+        public FiniteTokenLengthQueueChatMemory(
+            int maxTokenLength,
+            // TODO: Use enum instead of string
+            string model = "gpt-3.5-turbo")
         {
             this.maxTokenLength = maxTokenLength;
             this.tikToken = TikToken.EncodingForModel(model);
@@ -21,7 +24,7 @@ namespace Mochineko.LLMAgent.Memory
             => queue.ToArray();
         
         public int TokenLength
-            => CalculateTotalTokenLength();
+            => queue.TokenLength(tikToken);
 
         public void AddMessage(Message message)
         {
@@ -36,19 +39,6 @@ namespace Mochineko.LLMAgent.Memory
         public void ClearAllMessages()
         {
             queue.Clear();
-        }
-
-        private int CalculateTotalTokenLength()
-        {
-            var length = 0;
-            foreach (var message in queue)
-            {
-                length += tikToken
-                    .Encode(message.Content)
-                    .Count;
-            }
-
-            return length;
         }
     }
 }

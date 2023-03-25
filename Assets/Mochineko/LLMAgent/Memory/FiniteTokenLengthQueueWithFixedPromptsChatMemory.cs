@@ -13,7 +13,9 @@ namespace Mochineko.LLMAgent.Memory
         private readonly Queue<Message> queue = new();
         private readonly List<Message> prompts = new();
 
-        public FiniteTokenLengthQueueWithFixedPromptsChatMemory(int maxTokenLengthWithoutPrompts, string model = "gpt-3.5-turbo")
+        public FiniteTokenLengthQueueWithFixedPromptsChatMemory(
+            int maxTokenLengthWithoutPrompts,
+            string model = "gpt-3.5-turbo")
         {
             this.maxTokenLengthWithoutPrompts = maxTokenLengthWithoutPrompts;
             this.tikToken = TikToken.EncodingForModel(model);
@@ -25,11 +27,14 @@ namespace Mochineko.LLMAgent.Memory
                 .ToList();
 
         public int TokenLengthWithoutPrompts
-            => CalculateTokenLength(queue);
+            => queue.TokenLength(tikToken);
+        
+        private int PromptsTokenLength
+            => prompts.TokenLength(tikToken);
 
-        public int TotalTokenLength
-            => CalculateTokenLength(prompts)
-               + CalculateTokenLength(queue);
+        public int MemoriesTokenLength
+            => PromptsTokenLength
+               + TokenLengthWithoutPrompts;
 
         public void AddMessage(Message message)
         {
@@ -57,19 +62,6 @@ namespace Mochineko.LLMAgent.Memory
         public void ClearMessagesWithoutPrompts()
         {
             queue.Clear();
-        }
-
-        private int CalculateTokenLength(IEnumerable<Message> messages)
-        {
-            var length = 0;
-            foreach (var message in messages)
-            {
-                length += tikToken
-                    .Encode(message.Content)
-                    .Count;
-            }
-
-            return length;
         }
     }
 }

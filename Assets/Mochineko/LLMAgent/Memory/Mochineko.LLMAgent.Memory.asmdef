@@ -1,0 +1,17 @@
+{
+    "name": "Mochineko.LLMAgent.Memory",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d63d7a0555b6b4b0a9148c0dbfcd7265",
+        "GUID:17094be796ef04d9597855583d8aa5f6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -4,10 +4,11 @@ using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.ChatGPT_API;
-using Mochineko.KoeiromapAPI;
 using Mochineko.LLMAgent.Chat;
 using Mochineko.LLMAgent.Emotion;
+using Mochineko.LLMAgent.Memory;
 using Mochineko.LLMAgent.Speech;
+using Mochineko.LLMAgent.Summarization;
 using Mochineko.Relent.Result;
 using Mochineko.RelentJsonSerialization;
 using UnityEngine;
@@ -17,12 +18,19 @@ namespace Mochineko.LLMAgent.Operation
 {
     internal sealed class DemoOperator : MonoBehaviour
     {
+        [SerializeField] private Model model = Model.Turbo;
         [SerializeField, TextArea] private string prompt = string.Empty;
+        [SerializeField, TextArea] private string defaultConversations = string.Empty;
         [SerializeField, TextArea] private string message = string.Empty;
         [SerializeField, Range(-3f, 3f)] private float speakerX;
         [SerializeField, Range(-3f, 3f)] private float speakerY;
         [SerializeField] private SpeechQueue? speechQueue;
+        [SerializeField] private bool skipSpeechSynthesis = false;
 
+        private IChatMemoryStore? store;
+        private LongTermChatMemory? memory;
+        internal LongTermChatMemory? Memory => memory;
+        
         private ChatCompletion? chatCompletion;
         private SpeechSynthesis? speechSynthesis;
 
@@ -31,19 +39,53 @@ namespace Mochineko.LLMAgent.Operation
             Assert.IsNotNull(speechQueue);
         }
 
-        private void Start()
+        private async void Start()
         {
             var apiKeyPath = Path.Combine(
                 Application.dataPath,
                 "Mochineko/LLMAgent/Operation/OpenAI_API_Key.txt");
 
-            string apiKey = File.ReadAllText(apiKeyPath);
+            var apiKey = await File.ReadAllTextAsync(apiKeyPath);
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new Exception($"[LLMAgent.Operation] Loaded API Key is empty from path:{apiKeyPath}");
+            }
+
+            store = new PlayerPrefsChatMemoryStore();
+            
+            memory = await LongTermChatMemory.InstantiateAsync(
+                maxShortTermMemoriesTokenLength: 1000,
+                maxBufferMemoriesTokenLength: 1000,
+                apiKey,
+                model,
+                store,
+                this.GetCancellationTokenOnDestroy());
 
             chatCompletion = new ChatCompletion(
                 apiKey,
-                Model.Turbo,
+                model,
                 prompt + ". " + PromptTemplate.ChatAgentEmotionAnalysisTemplate,
-                50);
+                memory);
+
+            if (!string.IsNullOrEmpty(defaultConversations))
+            {
+                var conversationsDeserializeResult = RelentJsonSerializer
+                    .Deserialize<ConversationCollection>(defaultConversations);
+                if (conversationsDeserializeResult is ISuccessResult<ConversationCollection> successResult)
+                {
+                    for (var i = 0; i < successResult.Result.Conversations.Count; i++)
+                    {
+                        await memory.AddMessageAsync(
+                            successResult.Result.Conversations[i],
+                            this.GetCancellationTokenOnDestroy());
+                    }
+                }
+                else if (conversationsDeserializeResult is IFailureResult<ConversationCollection> failureResult)
+                {
+                    Debug.LogError(
+                        $"[LLMAgent.Operation] Failed to deserialize default conversations because -> {failureResult.Message}");
+                }
+            }
 
             speechSynthesis = new SpeechSynthesis(
                 new Vector2(speakerX, speakerY));
@@ -86,6 +128,11 @@ namespace Mochineko.LLMAgent.Operation
                         threshold: 0.5f);
                     
                     Debug.Log($"[LLMAgent.Operation] Exclude emotion style: {emotionStyle}.");
+
+                    if (skipSpeechSynthesis)
+                    {
+                        return;
+                    }
                     
                     var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
                         HttpClientPool.PooledClient,

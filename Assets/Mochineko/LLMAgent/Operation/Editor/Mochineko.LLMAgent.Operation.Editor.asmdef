@@ -1,14 +1,15 @@
 {
-    "name": "Mochineko.LLMAgent.Memory",
+    "name": "Mochineko.LLMAgent.Operation.Editor",
     "rootNamespace": "",
     "references": [
+        "GUID:9f6390ff1695f4acf9e02314b845e14f",
         "GUID:d63d7a0555b6b4b0a9148c0dbfcd7265",
-        "GUID:17094be796ef04d9597855583d8aa5f6",
-        "GUID:cc686f3d1affe4dbcb2c0c1962bcbe48",
-        "GUID:3ed995982eec04b2e9d304b5b6242945",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+        "GUID:0c3c6b324c73a4c10ae0a16131a05510",
+        "GUID:cc686f3d1affe4dbcb2c0c1962bcbe48"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

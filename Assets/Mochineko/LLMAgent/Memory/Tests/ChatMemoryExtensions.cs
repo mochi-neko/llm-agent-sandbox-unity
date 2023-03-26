@@ -9,7 +9,7 @@ namespace Mochineko.LLMAgent.Memory.Tests
     {
         internal static void ShouldBeSameContentsAs(this IChatMemory memory, IReadOnlyList<Message> expected)
         {
-            var messages = memory.Memories;
+            var messages = memory.Messages;
 
             messages.Count.Should().Be(expected.Count);
 

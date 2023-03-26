@@ -9,7 +9,7 @@ namespace Mochineko.RelentJsonSerialization
     {
         public static IResult<string> Serialize<T>(
             T serialized,
-            JsonSerializerSettings? settings)
+            JsonSerializerSettings? settings = null)
         {
             try
             {

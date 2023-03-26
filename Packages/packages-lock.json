@@ -15,18 +15,25 @@
       "hash": "73d86259ce31ce7f4dfe1d028ea1c3edf96c23e4"
     },
     "com.mochineko.chatgpt-api": {
-      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API#0.3.1",
+      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API#0.4.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "c656c3dcefd18c841c426475b947e26b008ed8e9"
+      "hash": "4dde292f5a6c99701949f3c07bbaee2971378d6c"
+    },
+    "com.mochineko.chatgpt-api.memory": {
+      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API.Memory#0.4.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "4dde292f5a6c99701949f3c07bbaee2971378d6c"
     },
     "com.mochineko.chatgpt-api.relent": {
-      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API.Relent#0.3.1",
+      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/ChatGPT_API.Relent#0.4.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "c656c3dcefd18c841c426475b947e26b008ed8e9"
+      "hash": "4dde292f5a6c99701949f3c07bbaee2971378d6c"
     },
     "com.mochineko.relent.resilience": {
       "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent/Resilience#0.1.1",
@@ -57,11 +64,11 @@
       "hash": "fb76f048a78ef9fa4e0d00df6f184d1b7a64042b"
     },
     "com.mochineko.tiktoken-sharp": {
-      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/TiktokenSharp#0.3.1",
+      "version": "https://github.com/mochi-neko/ChatGPT-API-unity.git?path=/Assets/Mochineko/TiktokenSharp#0.4.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "c656c3dcefd18c841c426475b947e26b008ed8e9"
+      "hash": "4dde292f5a6c99701949f3c07bbaee2971378d6c"
     },
     "com.naudio.core": {
       "version": "https://github.com/mochi-neko/simple-audio-codec-unity.git?path=/Assets/NAudio/NAudio.Core#0.2.0",

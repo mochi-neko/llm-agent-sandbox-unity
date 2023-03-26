@@ -2,7 +2,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.ChatGPT_API;
-using Mochineko.ChatGPT_API.Memories;
 using Mochineko.ChatGPT_API.Relent;
 using Mochineko.Relent.Resilience;
 using Mochineko.Relent.Result;
@@ -14,26 +13,25 @@ namespace Mochineko.LLMAgent.Chat
     public sealed class ChatCompletion
     {
         private readonly Model model;
+        private readonly IChatMemory memory;
         private readonly RelentChatCompletionAPIConnection connection;
-        private readonly FiniteQueueChatMemory memory;
         private readonly IPolicy<ChatCompletionResponseBody> policy;
 
         public ChatCompletion(
             string apiKey,
             Model model,
             string prompt,
-            int maxMemoryCount)
+            IChatMemory memory)
         {
             this.model = model;
-            
-            memory = new FiniteQueueChatMemory(maxMemoryCount);
+            this.memory = memory;
 
-            connection = new RelentChatCompletionAPIConnection(
+            this.connection = new RelentChatCompletionAPIConnection(
                 apiKey,
                 memory,
                 prompt);
 
-            policy = PolicyFactory.BuildPolicy();
+            this.policy = PolicyFactory.BuildPolicy();
         }
         
         public void ClearMemory()
@@ -57,8 +55,6 @@ namespace Mochineko.LLMAgent.Chat
                         model),
                 cancellationToken);
 
-            await UniTask.SwitchToMainThread(cancellationToken);
-            
             if (result is IUncertainSuccessResult<ChatCompletionResponseBody> success)
             {
                 Debug.Log($"[LLMAgent.Chat] Succeeded to complete chat -> {success.Result.ResultMessage}");

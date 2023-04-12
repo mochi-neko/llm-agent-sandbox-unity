@@ -12,14 +12,14 @@ namespace Mochineko.LLMAgent.Memory
         public UniTask<IResult<string>> LoadAsync(CancellationToken cancellationToken)
         {
             return UniTask.FromResult<IResult<string>>(
-                ResultFactory.Succeed(memory));
+                Results.Succeed(memory));
         }
 
         public UniTask<IResult> SaveAsync(string memory, CancellationToken cancellationToken)
         {
             this.memory = memory;
             return UniTask.FromResult<IResult>(
-                ResultFactory.Succeed());
+                Results.Succeed());
         }
     }
 }

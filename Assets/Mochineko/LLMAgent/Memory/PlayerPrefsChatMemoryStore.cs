@@ -20,18 +20,18 @@ namespace Mochineko.LLMAgent.Memory
                 if (!string.IsNullOrEmpty(memory))
                 {
                     return UniTask.FromResult<IResult<string>>(
-                        ResultFactory.Succeed(memory));
+                        Results.Succeed(memory));
                 }
                 else
                 {
                     return UniTask.FromResult<IResult<string>>(
-                        ResultFactory.Fail<string>("Failed to load chat memory from PlayerPrefs because it is empty."));
+                        Results.Fail<string>("Failed to load chat memory from PlayerPrefs because it is empty."));
                 }
             }
             catch (Exception exception)
             {
                 return UniTask.FromResult<IResult<string>>(
-                    ResultFactory.Fail<string>(
+                    Results.Fail<string>(
                         $"Failed to load chat memory from PlayerPrefs because -> {exception}."));
             }
         }
@@ -45,12 +45,12 @@ namespace Mochineko.LLMAgent.Memory
                 PlayerPrefs.SetString(Key, memory);
                 
                 return UniTask.FromResult<IResult>(
-                    ResultFactory.Succeed());
+                    Results.Succeed());
             }
             catch (Exception exception)
             {
                 return UniTask.FromResult<IResult>(
-                    ResultFactory.Fail(
+                    Results.Fail(
                         $"Failed to save chat memory from PlayerPrefs because -> {exception}."));
             }
         }

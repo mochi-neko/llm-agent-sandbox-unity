@@ -9,8 +9,8 @@ using Mochineko.LLMAgent.Emotion;
 using Mochineko.LLMAgent.Memory;
 using Mochineko.LLMAgent.Speech;
 using Mochineko.LLMAgent.Summarization;
+using Mochineko.Relent.Extensions.NewtonsoftJson;
 using Mochineko.Relent.Result;
-using Mochineko.RelentJsonSerialization;
 using UnityEngine;
 using UnityEngine.Assertions;
 

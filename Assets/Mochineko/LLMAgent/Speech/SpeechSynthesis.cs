@@ -61,12 +61,12 @@ namespace Mochineko.LLMAgent.Speech
                 if (decodeResult is ISuccessResult<AudioClip> decodeSuccess)
                 {
                     Debug.Log($"[LLMAgent.Speech] Succeeded to synthesis speech from text:{text}.");
-                    return ResultFactory.Succeed(decodeSuccess.Result);
+                    return Results.Succeed(decodeSuccess.Result);
                 }
                 else if (decodeResult is IFailureResult<AudioClip> decodeFailure)
                 {
                     Debug.LogError($"[LLMAgent.Speech] Failed to decode audio stream because -> {decodeFailure.Message}.");
-                    return ResultFactory.Fail<AudioClip>(
+                    return Results.FailWithTrace<AudioClip>(
                         $"Failed to decode audio stream because -> {decodeFailure.Message}.");
                 }
                 else
@@ -77,13 +77,13 @@ namespace Mochineko.LLMAgent.Speech
             else if (synthesisResult is IUncertainRetryableResult<Stream> retryable)
             {
                 Debug.LogError($"[LLMAgent.Speech] Failed to synthesis speech from text because -> {retryable.Message}.");
-                return ResultFactory.Fail<AudioClip>(
+                return Results.FailWithTrace<AudioClip>(
                     $"Failed to synthesis speech from text because -> {retryable.Message}.");
             }
             else if (synthesisResult is IUncertainFailureResult<Stream> failure)
             {
                 Debug.LogError($"[LLMAgent.Speech] Failed to synthesis speech from text because -> {failure.Message}.");
-                return ResultFactory.Fail<AudioClip>(
+                return Results.FailWithTrace<AudioClip>(
                     $"Failed to synthesis speech from text because -> {failure.Message}.");
             }
             else

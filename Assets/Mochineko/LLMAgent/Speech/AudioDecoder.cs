@@ -23,11 +23,11 @@ namespace Mochineko.LLMAgent.Speech
                     fileName: fileName,
                     cancellationToken);
 
-                return ResultFactory.Succeed(audioClip);
+                return Results.Succeed(audioClip);
             }
             catch (Exception exception)
             {
-                return ResultFactory.Fail<AudioClip>(
+                return Results.FailWithTrace<AudioClip>(
                     $"Failed to decode audio stream because -> {exception}.");
             }
         }

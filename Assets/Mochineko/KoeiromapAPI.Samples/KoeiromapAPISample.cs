@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.IO;
 using System.Net.Http;
@@ -17,18 +18,18 @@ namespace Mochineko.KoeiromapAPI.Samples
         [SerializeField, Range(-3f, 3f)] private float speakerY;
         [SerializeField] private bool useSeed;
         [SerializeField] private ulong seed;
-        [SerializeField, TextArea] private string text;
+        [SerializeField, TextArea] private string text = string.Empty;
         [SerializeField] private Style style;
-        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioSource? audioSource;
 
-        private static readonly HttpClient httpClient = new();
-        
-        private IPolicy<Stream> policy;
+        private static readonly HttpClient HttpClient = new();
+
+        private IPolicy<Stream>? policy;
 
         private void Awake()
         {
             Assert.IsNotNull(audioSource);
-            
+
             policy = PolicyFactory.BuildPolicy();
         }
 
@@ -38,19 +39,24 @@ namespace Mochineko.KoeiromapAPI.Samples
             SynthesisAsync(text, style, this.GetCancellationTokenOnDestroy())
                 .Forget();
         }
-        
+
         private async UniTask SynthesisAsync(
             string text,
             Style style,
             CancellationToken cancellationToken)
         {
+            if (policy == null || audioSource == null)
+            {
+                return;
+            }
+
             Debug.Log($"Begin to synthesis speech from text:{text}.");
-            
+
             await UniTask.SwitchToThreadPool();
 
             var synthesisResult = await policy.ExecuteAsync(
                 async innerCancellationToken => await SpeechSynthesisAPI.SynthesisAsync(
-                    httpClient,
+                    HttpClient,
                     text,
                     innerCancellationToken,
                     speakerX: speakerX,

@@ -58,18 +58,18 @@ namespace Mochineko.LLMAgent.Chat
             if (result is IUncertainSuccessResult<ChatCompletionResponseBody> success)
             {
                 Debug.Log($"[LLMAgent.Chat] Succeeded to complete chat -> {success.Result.ResultMessage}");
-                return ResultFactory.Succeed(success.Result.ResultMessage);
+                return Results.Succeed(success.Result.ResultMessage);
             }
             else if (result is IUncertainRetryableResult<ChatCompletionResponseBody> retryable)
             {
                 Debug.LogError($"[LLMAgent.Chat] Failed to complete chat because -> {retryable.Message}");
-                return ResultFactory.Fail<string>(
+                return Results.FailWithTrace<string>(
                     $"Failed to complete chat because -> {retryable.Message}.");
             }
             else if (result is IUncertainFailureResult<ChatCompletionResponseBody> failure)
             {
                 Debug.LogError($"[LLMAgent.Chat] Failed to complete chat because -> {failure.Message}");
-                return ResultFactory.Fail<string>(
+                return Results.FailWithTrace<string>(
                     $"Failed to complete chat because -> {failure.Message}.");
             }
             else

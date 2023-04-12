@@ -4,10 +4,10 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.ChatGPT_API;
 using Mochineko.ChatGPT_API.Relent;
+using Mochineko.Relent.Extensions.NewtonsoftJson;
 using Mochineko.Relent.Resilience;
 using Mochineko.Relent.Result;
 using Mochineko.Relent.UncertainResult;
-using Mochineko.RelentJsonSerialization;
 using TiktokenSharp;
 using UnityEngine;
 
@@ -65,7 +65,7 @@ namespace Mochineko.LLMAgent.Summarization
             {
                 Debug.LogError(
                     $"[LLMAgent.Summarization] Failed to serialize conversations because -> {serializeFailure.Message}.");
-                return ResultFactory.Fail<string>(
+                return Results.FailWithTrace<string>(
                     $"Failed to serialize conversations because -> {serializeFailure.Message}");
             }
             else
@@ -90,18 +90,18 @@ namespace Mochineko.LLMAgent.Summarization
             {
                 Debug.Log(
                     $"[LLMAgent.Summarization] Succeeded to summarize messages -> {success.Result.ResultMessage}");
-                return ResultFactory.Succeed(success.Result.ResultMessage);
+                return Results.Succeed(success.Result.ResultMessage);
             }
             else if (result is IUncertainRetryableResult<ChatCompletionResponseBody> retryable)
             {
                 Debug.LogError($"[LLMAgent.Summarization] Failed to summarize messages because -> {retryable.Message}");
-                return ResultFactory.Fail<string>(
+                return Results.FailWithTrace<string>(
                     $"Failed to summarize messages because -> {retryable.Message}.");
             }
             else if (result is IUncertainFailureResult<ChatCompletionResponseBody> failure)
             {
                 Debug.LogError($"[LLMAgent.Summarization] Failed to summarize messages because -> {failure.Message}");
-                return ResultFactory.Fail<string>(
+                return Results.FailWithTrace<string>(
                     $"Failed to summarize messages because -> {failure.Message}.");
             }
             else

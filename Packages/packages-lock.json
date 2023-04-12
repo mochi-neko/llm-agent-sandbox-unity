@@ -28,6 +28,27 @@
       "dependencies": {},
       "hash": "c1a703cc51e2fe939baf6f0e7a4786c591b0611e"
     },
+    "com.mochineko.facial-expressions": {
+      "version": "https://github.com/mochi-neko/facial-expressions-unity.git?path=/Assets/Mochineko/FacialExpressions#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8340d7f8b90c660d9ca93b54e17d5b5c7e9236b7"
+    },
+    "com.mochineko.facial-expressions.extensions.voicevox": {
+      "version": "https://github.com/mochi-neko/facial-expressions-unity.git?path=/Assets/Mochineko/FacialExpressions.Extensions/VOICEVOX#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8340d7f8b90c660d9ca93b54e17d5b5c7e9236b7"
+    },
+    "com.mochineko.facial-expressions.extensions.vrm": {
+      "version": "https://github.com/mochi-neko/facial-expressions-unity.git?path=/Assets/Mochineko/FacialExpressions.Extensions/VRM#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8340d7f8b90c660d9ca93b54e17d5b5c7e9236b7"
+    },
     "com.mochineko.relent": {
       "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
       "depth": 0,
@@ -45,12 +66,29 @@
       },
       "hash": "5fd87387912763429e4c8008157ed6a654c3093c"
     },
+    "com.mochineko.relent.extensions.unitask": {
+      "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent.Extensions/UniTask#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.mochineko.relent": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
+        "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
+      },
+      "hash": "5fd87387912763429e4c8008157ed6a654c3093c"
+    },
     "com.mochineko.simple-audio-codec-unity": {
       "version": "https://github.com/mochi-neko/simple-audio-codec-unity.git?path=/Assets/Mochineko/SimpleAudioCodec#0.2.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
       "hash": "fb76f048a78ef9fa4e0d00df6f184d1b7a64042b"
+    },
+    "com.mochineko.voicevox-api": {
+      "version": "https://github.com/mochi-neko/VOICEVOX-API-unity.git?path=/Assets/Mochineko/VOICEVOX_API#0.2.2",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "089b221bfb33e1cb7743a20a3d8a2df1b76a99dc"
     },
     "com.naudio.core": {
       "version": "https://github.com/mochi-neko/simple-audio-codec-unity.git?path=/Assets/NAudio/NAudio.Core#0.2.0",
@@ -190,6 +228,35 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
+    },
+    "com.vrmc.gltf": {
+      "version": "https://github.com/vrm-c/UniVRM.git?path=/Assets/UniGLTF#v0.108.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.vrmc.vrmshaders": "0.108.0",
+        "com.unity.modules.animation": "1.0.0"
+      },
+      "hash": "e16dd2f8c0c15fb373eeef6375c550acc740a2f6"
+    },
+    "com.vrmc.vrm": {
+      "version": "https://github.com/vrm-c/UniVRM.git?path=/Assets/VRM10#v0.108.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.vrmc.vrmshaders": "0.108.0",
+        "com.vrmc.gltf": "0.108.0"
+      },
+      "hash": "e16dd2f8c0c15fb373eeef6375c550acc740a2f6"
+    },
+    "com.vrmc.vrmshaders": {
+      "version": "https://github.com/vrm-c/UniVRM.git?path=/Assets/VRMShaders#v0.108.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.modules.imageconversion": "1.0.0"
+      },
+      "hash": "e16dd2f8c0c15fb373eeef6375c550acc740a2f6"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

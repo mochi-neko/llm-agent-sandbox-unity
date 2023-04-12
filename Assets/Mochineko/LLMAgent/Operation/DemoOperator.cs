@@ -32,7 +32,7 @@ namespace Mochineko.LLMAgent.Operation
         internal LongTermChatMemory? Memory => memory;
         
         private ChatCompletion? chatCompletion;
-        private SpeechSynthesis? speechSynthesis;
+        private KoeiromapSpeechSynthesis? speechSynthesis;
 
         private void Awake()
         {
@@ -87,7 +87,7 @@ namespace Mochineko.LLMAgent.Operation
                 }
             }
 
-            speechSynthesis = new SpeechSynthesis(
+            speechSynthesis = new KoeiromapSpeechSynthesis(
                 new Vector2(speakerX, speakerY));
         }
 

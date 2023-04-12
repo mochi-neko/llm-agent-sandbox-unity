@@ -23,7 +23,7 @@ namespace Mochineko.LLMAgent.Speech
         {
             this.speaker = speaker;
             this.seed = seed;
-            this.policy = PolicyFactory.BuildPolicy();
+            this.policy = PolicyFactory.BuildSynthesisPolicy();
         }
 
         public async UniTask<IResult<AudioClip>> SynthesisSpeechAsync(

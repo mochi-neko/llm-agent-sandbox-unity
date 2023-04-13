@@ -2,24 +2,18 @@
 using System;
 using System.Collections.Concurrent;
 using Cysharp.Threading.Tasks;
-using Mochineko.FacialExpressions.Emotion;
 using Mochineko.FacialExpressions.Samples;
-using Mochineko.VOICEVOX_API.QueryCreation;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Mochineko.LLMAgent.Operation
 {
-    public sealed class SpeechQueue : MonoBehaviour
+    internal sealed class SpeechQueue : MonoBehaviour
     {
         [SerializeField] private AudioSource? audioSource = null;
         [SerializeField] private CharacterOperator? characterOperator = null;
 
-        private readonly ConcurrentQueue<(
-                AudioQuery query,
-                AudioClip clip,
-                EmotionSample<FacialExpressions.Emotion.Emotion> emotion)>
-            queue = new();
+        private readonly ConcurrentQueue<SpeechCommand> queue = new();
 
         private AudioClip? currentClip;
 
@@ -57,15 +51,12 @@ namespace Mochineko.LLMAgent.Operation
 
             if (queue.TryDequeue(out var command))
             {
-                BeginSpeechAsync(command.query, command.clip, command.emotion)
+                BeginSpeechAsync(command)
                     .Forget();
             }
         }
 
-        private async UniTask BeginSpeechAsync(
-            AudioQuery query,
-            AudioClip clip,
-            EmotionSample<FacialExpressions.Emotion.Emotion> emotion)
+        private async UniTask BeginSpeechAsync(SpeechCommand command)
         {
             if (audioSource == null)
             {
@@ -77,26 +68,24 @@ namespace Mochineko.LLMAgent.Operation
                 Destroy(currentClip);
             }
 
-            currentClip = clip;
+            currentClip = command.AudioClip;
             audioSource.clip = currentClip;
             audioSource.Play();
 
             if (characterOperator != null)
             {
-                characterOperator.Emote(emotion);
+                characterOperator.Emote(command.Emotion);
                 await characterOperator.AnimateLipAsync(
-                        query,
-                        this.GetCancellationTokenOnDestroy());
-                
+                    command.AudioQuery,
+                    this.GetCancellationTokenOnDestroy());
+
                 characterOperator.ResetEmotion();
                 characterOperator.ResetLip();
+                characterOperator.ApplyPose(command.Pose);
             }
         }
 
-        public void Enqueue((
-            AudioQuery query,
-            AudioClip clip,
-            EmotionSample<FacialExpressions.Emotion.Emotion> emotion) command)
+        public void Enqueue(SpeechCommand command)
         {
             queue.Enqueue(command);
         }

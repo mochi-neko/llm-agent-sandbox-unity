@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -7,10 +8,13 @@ using Mochineko.FacialExpressions.Emotion;
 using Mochineko.FacialExpressions.Extensions.VOICEVOX;
 using Mochineko.FacialExpressions.Extensions.VRM;
 using Mochineko.FacialExpressions.LipSync;
+using Mochineko.LLMAgent.Pose;
 using Mochineko.VOICEVOX_API.QueryCreation;
 using UnityEngine;
 using UniVRM10;
 using VRMShaders;
+
+#pragma warning disable CS8625
 
 namespace Mochineko.FacialExpressions.Samples
 {
@@ -24,6 +28,7 @@ namespace Mochineko.FacialExpressions.Samples
         private IEyelidAnimator? eyelidAnimator;
         private IEmotionMorpher<Emotion.Emotion>? emotionMorpher;
         private ExclusiveFollowingEmotionAnimator<Emotion.Emotion>? emotionAnimator;
+        private VRMPoser? poser;
 
         private async void Start()
         {
@@ -55,6 +60,9 @@ namespace Mochineko.FacialExpressions.Samples
             emotionAnimator = new ExclusiveFollowingEmotionAnimator<Emotion.Emotion>(
                 emotionMorpher,
                 followingTime: emotionFollowingTime);
+
+            poser = new VRMPoser(instance.Runtime.ControlRig);
+            poser.ApplyPose(PoseTemplate.Neutral);
         }
 
         private void Update()
@@ -72,7 +80,7 @@ namespace Mochineko.FacialExpressions.Samples
             return await Vrm10.LoadBytesAsync(
                 bytes: binaryData,
                 canLoadVrm0X: true,
-                controlRigGenerationOption: ControlRigGenerationOption.None,
+                controlRigGenerationOption: ControlRigGenerationOption.Generate,
                 showMeshes: true,
                 awaitCaller: new RuntimeOnlyAwaitCaller(),
                 materialGenerator: null,
@@ -110,6 +118,11 @@ namespace Mochineko.FacialExpressions.Samples
         public void ResetEmotion()
         {
             emotionMorpher?.Reset();
+        }
+
+        public void ApplyPose(Dictionary<HumanBodyBones, BoneLocalRotation> pose)
+        {
+            poser?.ApplyPose(pose);
         }
     }
 }

@@ -37,13 +37,13 @@ namespace Mochineko.LLMAgent.Memory
             IChatMemoryStore? store,
             CancellationToken cancellationToken)
         {
-            var instance = new  LongTermChatMemory(
+            var instance = new LongTermChatMemory(
                 maxShortTermMemoriesTokenLength,
                 maxBufferMemoriesTokenLength,
                 apiKey,
                 model,
                 store);
-            
+
             var result = await instance.store.LoadAsync(cancellationToken);
             if (result is ISuccessResult<string> success)
             {
@@ -74,68 +74,34 @@ namespace Mochineko.LLMAgent.Memory
             this.maxBufferMemoriesTokenLength = maxBufferMemoriesTokenLength;
             this.tikToken = TikToken.EncodingForModel(model.ToText());
             this.summarizer = new Summarizer(apiKey, model);
-            
+
             this.store = store ?? new NullChatMemoryStore();
             this.summary = new Message(Role.System, string.Empty);
         }
 
         public IReadOnlyList<Message> Messages
-        {
-            get
-            {
-                lock (lockObject)
-                {
-                    return prompts
-                        .Concat(new[] { summary })
-                        .Concat(shortTermMemories)
-                        .ToList();
-                }
-            }
-        }
+            => prompts
+                .Concat(new[] { summary })
+                .Concat(shortTermMemories)
+                .ToList();
+
+        public IReadOnlyList<Message> Conversations
+            => new[] { summary }
+                .Concat(shortTermMemories)
+                .Concat(bufferMemories)
+                .ToList();
 
         public int ShortTermMemoriesTokenLength
-        {
-            get
-            {
-                lock (lockObject)
-                {
-                    return shortTermMemories.TokenLength(tikToken);
-                }
-            }
-        }
+            => shortTermMemories.TokenLength(tikToken);
 
         public int BufferMemoriesTokenLength
-        {
-            get
-            {
-                lock (lockObject)
-                {
-                    return bufferMemories.TokenLength(tikToken);
-                }
-            }
-        }
+            => bufferMemories.TokenLength(tikToken);
 
         public int SummaryTokenLength
-        {
-            get
-            {
-                lock (lockObject)
-                {
-                    return summary.TokenLength(tikToken);
-                }
-            }
-        }
+            => summary.TokenLength(tikToken);
 
         public int PromptsTokenLength
-        {
-            get
-            {
-                lock (lockObject)
-                {
-                    return prompts.TokenLength(tikToken);
-                }
-            }
-        }
+            => prompts.TokenLength(tikToken);
 
         public int TotalMemoriesTokenLength
             => PromptsTokenLength

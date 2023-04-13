@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.ChatGPT_API;
+using Mochineko.FacialExpressions.Emotion;
 using Mochineko.LLMAgent.Chat;
 using Mochineko.LLMAgent.Emotion;
 using Mochineko.LLMAgent.Memory;
@@ -11,6 +12,7 @@ using Mochineko.LLMAgent.Speech;
 using Mochineko.LLMAgent.Summarization;
 using Mochineko.Relent.Extensions.NewtonsoftJson;
 using Mochineko.Relent.Result;
+using Mochineko.VOICEVOX_API.QueryCreation;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,17 +24,16 @@ namespace Mochineko.LLMAgent.Operation
         [SerializeField, TextArea] private string prompt = string.Empty;
         [SerializeField, TextArea] private string defaultConversations = string.Empty;
         [SerializeField, TextArea] private string message = string.Empty;
-        [SerializeField, Range(-3f, 3f)] private float speakerX;
-        [SerializeField, Range(-3f, 3f)] private float speakerY;
-        [SerializeField] private SpeechQueue? speechQueue;
-        [SerializeField] private bool skipSpeechSynthesis = false;
+        [SerializeField] private int speakerID;
+        [SerializeField] private SpeechQueue? speechQueue = null;
+        [SerializeField] private float emotionWeight = 1f;
 
         private IChatMemoryStore? store;
         private LongTermChatMemory? memory;
         internal LongTermChatMemory? Memory => memory;
-        
+
         private ChatCompletion? chatCompletion;
-        private KoeiromapSpeechSynthesis? speechSynthesis;
+        private VoiceVoxSpeechSynthesis? speechSynthesis;
 
         private void Awake()
         {
@@ -51,8 +52,8 @@ namespace Mochineko.LLMAgent.Operation
                 throw new Exception($"[LLMAgent.Operation] Loaded API Key is empty from path:{apiKeyPath}");
             }
 
-            store = new PlayerPrefsChatMemoryStore();
-            
+            store = new NullChatMemoryStore();
+
             memory = await LongTermChatMemory.InstantiateAsync(
                 maxShortTermMemoriesTokenLength: 1000,
                 maxBufferMemoriesTokenLength: 1000,
@@ -64,8 +65,13 @@ namespace Mochineko.LLMAgent.Operation
             chatCompletion = new ChatCompletion(
                 apiKey,
                 model,
-                prompt + ". " + PromptTemplate.ChatAgentEmotionAnalysisTemplate,
+                prompt,
                 memory);
+
+            await memory.AddMessageAsync(new Message(
+                    Role.System,
+                    content: PromptTemplate.ChatAgentEmotionAnalysisTemplate),
+                CancellationToken.None);
 
             if (!string.IsNullOrEmpty(defaultConversations))
             {
@@ -87,8 +93,7 @@ namespace Mochineko.LLMAgent.Operation
                 }
             }
 
-            speechSynthesis = new KoeiromapSpeechSynthesis(
-                new Vector2(speakerX, speakerY));
+            speechSynthesis = new VoiceVoxSpeechSynthesis(speakerID);
         }
 
         [ContextMenu(nameof(StartChatAsync))]
@@ -115,48 +120,76 @@ namespace Mochineko.LLMAgent.Operation
                 throw new NullReferenceException(nameof(speechQueue));
             }
 
+            string chatResponse;
             var chatResult = await chatCompletion.CompleteChatAsync(message, cancellationToken);
-            if (chatResult is ISuccessResult<string> chatSuccess)
+            switch (chatResult)
             {
-                Debug.Log($"[LLMAgent.Operation] Emotionalized JSON message:{chatSuccess.Result}.");
-
-                var emotionalizationResult = RelentJsonSerializer.Deserialize<EmotionalMessage>(chatSuccess.Result);
-                if (emotionalizationResult is ISuccessResult<EmotionalMessage> emotionalizationSuccess)
+                case ISuccessResult<string> chatSuccess:
                 {
-                    var emotionStyle = EmotionToStyleConverter.ExcludeHighestEmotionStyle(
-                        emotionalizationSuccess.Result.Emotion,
-                        threshold: 0.5f);
-                    
-                    Debug.Log($"[LLMAgent.Operation] Exclude emotion style: {emotionStyle}.");
-
-                    if (skipSpeechSynthesis)
-                    {
-                        return;
-                    }
-                    
-                    var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
-                        HttpClientPool.PooledClient,
-                        emotionalizationSuccess.Result.Message,
-                        emotionStyle,
-                        cancellationToken);
-                    
-                    if (synthesisResult is ISuccessResult<AudioClip> synthesisSuccess)
-                    {
-                        speechQueue.Enqueue(synthesisSuccess.Result);
-                    }
-                    else
-                    {
-                        return;
-                    }
+                    Debug.Log($"[LLMAgent.Operation] Emotionalized JSON message:{chatSuccess.Result}.");
+                    chatResponse = chatSuccess.Result;
+                    break;
                 }
-                else
+
+                case IFailureResult<string> chatFailure:
                 {
+                    Debug.LogError($"[LLMAgent.Operation] Failed to complete chat because of {chatFailure.Message}.");
                     return;
                 }
+
+                default:
+                    throw new ResultPatternMatchException(nameof(chatResult));
             }
-            else
+
+            EmotionalMessage emotionalMessage;
+            var emotionalizationResult = RelentJsonSerializer.Deserialize<EmotionalMessage>(chatResponse);
+            switch (emotionalizationResult)
             {
-                return;
+                case ISuccessResult<EmotionalMessage> emotionalizationSuccess:
+                {
+                    emotionalMessage = emotionalizationSuccess.Result;
+                    break;
+                }
+
+                case IFailureResult<EmotionalMessage> emotionalizationFailure:
+                {
+                    Debug.LogError(
+                        $"[LLMAgent.Operation] Failed to deserialize emotional message:{chatResponse} because of {emotionalizationFailure.Message}.");
+                    return;
+                }
+
+                default:
+                    throw new ResultPatternMatchException(nameof(emotionalizationResult));
+            }
+
+            var emotion = EmotionConverter.ExcludeHighestEmotion(emotionalMessage.Emotion);
+            Debug.Log($"[LLMAgent.Operation] Exclude emotion:{emotion}.");
+
+            var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
+                HttpClientPool.PooledClient,
+                emotionalMessage.Message,
+                cancellationToken);
+
+            switch (synthesisResult)
+            {
+                case ISuccessResult<(AudioQuery query, AudioClip clip)> synthesisSuccess:
+                {
+                    speechQueue.Enqueue((
+                        synthesisSuccess.Result.query,
+                        synthesisSuccess.Result.clip,
+                        new EmotionSample<FacialExpressions.Emotion.Emotion>(emotion, emotionWeight)));
+                    break;
+                }
+
+                case IFailureResult<(AudioQuery query, AudioClip clip)> synthesisFailure:
+                {
+                    Debug.Log(
+                        $"[LLMAgent.Operation] Failed to synthesis speech because of {synthesisFailure.Message}.");
+                    return;
+                }
+
+                default:
+                    return;
             }
         }
     }

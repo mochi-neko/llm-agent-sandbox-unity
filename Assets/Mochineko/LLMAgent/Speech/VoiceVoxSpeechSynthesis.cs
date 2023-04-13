@@ -19,16 +19,14 @@ namespace Mochineko.LLMAgent.Speech
         private readonly IPolicy<Stream> synthesisPolicy;
 
         public VoiceVoxSpeechSynthesis(
-            int speakerID,
-            IPolicy<AudioQuery> queryPolicy,
-            IPolicy<Stream> synthesisPolicy)
+            int speakerID)
         {
             this.speakerID = speakerID;
-            this.queryPolicy = queryPolicy;
-            this.synthesisPolicy = synthesisPolicy;
+            this.queryPolicy = PolicyFactory.BuildQueryPolicy();
+            this.synthesisPolicy = PolicyFactory.BuildSynthesisPolicy();
         }
 
-        public async UniTask<IResult<AudioClip>> SynthesisSpeechAsync(
+        public async UniTask<IResult<(AudioQuery query, AudioClip clip)>> SynthesisSpeechAsync(
             HttpClient httpClient,
             string text,
             CancellationToken cancellationToken)
@@ -56,13 +54,13 @@ namespace Mochineko.LLMAgent.Speech
                 case IUncertainRetryableResult<AudioQuery> createAudioQueryRetryable:
                     Debug.LogError(
                         $"[LLMAgent.Speech] Failed to create audio query because -> {createAudioQueryRetryable.Message}.");
-                    return Results.FailWithTrace<AudioClip>(
+                    return Results.FailWithTrace<(AudioQuery, AudioClip)>(
                         $"Failed to create audio query because -> {createAudioQueryRetryable.Message}.");
 
                 case IUncertainFailureResult<AudioQuery> createAudioQueryFailure:
                     Debug.LogError(
                         $"[LLMAgent.Speech] Failed to create audio query because -> {createAudioQueryFailure.Message}.");
-                    return Results.FailWithTrace<AudioClip>(
+                    return Results.FailWithTrace<(AudioQuery, AudioClip)>(
                         $"Failed to create audio query because -> {createAudioQueryFailure.Message}.");
 
                 default:
@@ -96,13 +94,13 @@ namespace Mochineko.LLMAgent.Speech
                     if (decodeResult is ISuccessResult<AudioClip> decodeSuccess)
                     {
                         Debug.Log($"[LLMAgent.Speech] Succeeded to synthesis speech from text:{text}.");
-                        return Results.Succeed(decodeSuccess.Result);
+                        return Results.Succeed((audioQuery,decodeSuccess.Result));
                     }
                     else if (decodeResult is IFailureResult<AudioClip> decodeFailure)
                     {
                         Debug.LogError(
                             $"[LLMAgent.Speech] Failed to decode audio stream because -> {decodeFailure.Message}.");
-                        return Results.FailWithTrace<AudioClip>(
+                        return Results.FailWithTrace<(AudioQuery, AudioClip)>(
                             $"Failed to decode audio stream because -> {decodeFailure.Message}.");
                     }
                     else
@@ -114,13 +112,13 @@ namespace Mochineko.LLMAgent.Speech
                 case IUncertainRetryableResult<Stream> retryable:
                     Debug.LogError(
                         $"[LLMAgent.Speech] Failed to synthesis speech from text because -> {retryable.Message}.");
-                    return Results.FailWithTrace<AudioClip>(
+                    return Results.FailWithTrace<(AudioQuery, AudioClip)>(
                         $"Failed to synthesis speech from text because -> {retryable.Message}.");
 
                 case IUncertainFailureResult<Stream> failure:
                     Debug.LogError(
                         $"[LLMAgent.Speech] Failed to synthesis speech from text because -> {failure.Message}.");
-                    return Results.FailWithTrace<AudioClip>(
+                    return Results.FailWithTrace<(AudioQuery, AudioClip)>(
                         $"Failed to synthesis speech from text because -> {failure.Message}.");
 
                 default:

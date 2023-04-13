@@ -9,6 +9,7 @@ namespace Mochineko.LLMAgent.Emotion
             " The emotion value should be another JSON object with keys:" +
             " happiness, sadness, anger, fear, surprise and disgust." +
             " Each value should be a number between 0 and 1." +
-            " The message value should be a string.";
+            " The message value should be a string." +
+            " You must responde only JSON string.";
     }
 }

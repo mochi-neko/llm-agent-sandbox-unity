@@ -414,6 +414,35 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
+## VOICEVOX
+
+https://voicevox.hiroshiba.jp/term/
+
+```
+利用規約
+
+許諾内容
+
+1. 商用・非商用問わず利用することができます
+2. 作成された音声を利用する際は、各音声ライブラリの規約に従ってください
+3. 作成された音声の利用を他者に許諾する際は、当該他者に対し本許諾内容の 2 及び 3 の遵守を義務付けてください
+
+禁止事項
+
+- 本ソフトウェアの全てまたは一部を無断で再配布すること
+- 逆コンパイル・リバースエンジニアリング及びこれらの方法を公開すること
+- 製作者または第三者に不利益をもたらす行為
+- 公序良俗に反する行為
+
+免責事項
+
+本ソフトウェアにより生じた損害・不利益について、製作者は一切の責任を負いません。
+
+その他
+
+ご利用の際は VOICEVOX を利用したことがわかるクレジット表記が必要です。
+```
+
 ## Relent
 
 https://github.com/mochi-neko/Relent

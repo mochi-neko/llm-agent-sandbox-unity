@@ -81,7 +81,6 @@ namespace Mochineko.LLMAgent.Operation
 
                 characterOperator.ResetEmotion();
                 characterOperator.ResetLip();
-                characterOperator.ApplyPose(command.Pose);
             }
         }
 

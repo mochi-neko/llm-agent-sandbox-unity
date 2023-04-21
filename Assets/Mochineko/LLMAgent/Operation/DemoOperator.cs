@@ -8,7 +8,6 @@ using Mochineko.FacialExpressions.Emotion;
 using Mochineko.LLMAgent.Chat;
 using Mochineko.LLMAgent.Emotion;
 using Mochineko.LLMAgent.Memory;
-using Mochineko.LLMAgent.Pose;
 using Mochineko.LLMAgent.Speech;
 using Mochineko.LLMAgent.Summarization;
 using Mochineko.Relent.Extensions.NewtonsoftJson;
@@ -33,7 +32,6 @@ namespace Mochineko.LLMAgent.Operation
         private LongTermChatMemory? memory;
         internal LongTermChatMemory? Memory => memory;
         private ChatCompletion? chatCompletion;
-        private StateMemory? stateMemory;
         private ChatCompletion? stateCompletion;
         private VoiceVoxSpeechSynthesis? speechSynthesis;
 
@@ -90,14 +88,6 @@ namespace Mochineko.LLMAgent.Operation
                 }
             }
 
-            // stateMemory = new StateMemory(memory);
-            //
-            // stateCompletion = new ChatCompletion(
-            //     apiKey,
-            //     model,
-            //     string.Empty, 
-            //     stateMemory);
-
             speechSynthesis = new VoiceVoxSpeechSynthesis(speakerID);
         }
 
@@ -114,11 +104,6 @@ namespace Mochineko.LLMAgent.Operation
             {
                 throw new NullReferenceException(nameof(chatCompletion));
             }
-
-            // if (stateCompletion == null)
-            // {
-            //     throw new NullReferenceException(nameof(stateCompletion));
-            // }
 
             if (speechSynthesis == null)
             {
@@ -150,51 +135,6 @@ namespace Mochineko.LLMAgent.Operation
                 default:
                     throw new ResultPatternMatchException(nameof(chatResult));
             }
-            
-            // string stateResponse;
-            // stateMemory?.SetPromptAsUserMessage(PromptTemplate.StateResponseWithOneShot);
-            // var stateResult = await stateCompletion.CompleteChatAsync(
-            //     "dummy",
-            //     cancellationToken);
-            // switch (stateResult)
-            // {
-            //     case ISuccessResult<string> stateSuccess:
-            //     {
-            //         Debug.Log($"[LLMAgent.Operation] State JSON:{stateSuccess.Result}.");
-            //         stateResponse = stateSuccess.Result;
-            //         break;
-            //     }
-            //
-            //     case IFailureResult<string> stateFailure:
-            //     {
-            //         Debug.LogError($"[LLMAgent.Operation] Failed to complete state because of {stateFailure.Message}.");
-            //         return;
-            //     }
-            //
-            //     default:
-            //         throw new ResultPatternMatchException(nameof(chatResult));
-            // }
-            //
-            // State state;
-            // var deserializeResult = RelentJsonSerializer.Deserialize<State>(stateResponse);
-            // switch (deserializeResult)
-            // {
-            //     case ISuccessResult<State> deserializeSuccess:
-            //     {
-            //         state = deserializeSuccess.Result;
-            //         break;
-            //     }
-            //
-            //     case IFailureResult<State> deserializeFailure:
-            //     {
-            //         Debug.LogError(
-            //             $"[LLMAgent.Operation] Failed to deserialize state:{chatResponse} because of {deserializeFailure.Message}.");
-            //         return;
-            //     }
-            //
-            //     default:
-            //         throw new ResultPatternMatchException(nameof(deserializeResult));
-            // }
 
             EmotionalMessage emotionalMessage;
             var deserializeResult = RelentJsonSerializer.Deserialize<EmotionalMessage>(chatResponse);
@@ -217,7 +157,6 @@ namespace Mochineko.LLMAgent.Operation
                     throw new ResultPatternMatchException(nameof(deserializeResult));
             }
 
-
             var emotion = EmotionConverter.ExcludeHighestEmotion(emotionalMessage.Emotion);
             Debug.Log($"[LLMAgent.Operation] Exclude emotion:{emotion}.");
 
@@ -233,8 +172,7 @@ namespace Mochineko.LLMAgent.Operation
                     speechQueue.Enqueue(new SpeechCommand(
                         synthesisSuccess.Result.query,
                         synthesisSuccess.Result.clip,
-                        new EmotionSample<FacialExpressions.Emotion.Emotion>(emotion, emotionWeight),
-                        PoseTemplate.Neutral));
+                        new EmotionSample<FacialExpressions.Emotion.Emotion>(emotion, emotionWeight)));
                     break;
                 }
 

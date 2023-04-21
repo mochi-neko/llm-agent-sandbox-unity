@@ -56,6 +56,13 @@
       "dependencies": {},
       "hash": "5fd87387912763429e4c8008157ed6a654c3093c"
     },
+    "com.mochineko.relent-state-machine": {
+      "version": "https://github.com/mochi-neko/RelentStateMachine.git?path=/Assets/Mochineko/RelentStateMachine#0.1.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "8ed4fde0428bd517315eaa03413973e903320721"
+    },
     "com.mochineko.relent.extensions.newtonsoft-json": {
       "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent.Extensions/NewtonsofJson#0.2.0",
       "depth": 0,

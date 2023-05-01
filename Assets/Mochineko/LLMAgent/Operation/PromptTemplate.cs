@@ -14,7 +14,7 @@ namespace Mochineko.LLMAgent.Operation
             " user message: こんにちは、今日はいい天気ですね。," +
             " your response:" +
             " {" +
-            "   emotion: {\"happiness\": 0.8, \"sadness\": 0, \"anger\": 0, \"fear\": 0, \"surprise\": 0, \"disgust\": 0}" +
+            "   emotion: {\"happiness\": 0.8, \"sadness\": 0, \"anger\": 0, \"fear\": 0, \"surprise\": 0, \"disgust\": 0}," +
             "   message: \"こんにちは、お天気がいいと気持ちがいいですね。\"" +
             " }." +
             " You must responde only above JSON string.";

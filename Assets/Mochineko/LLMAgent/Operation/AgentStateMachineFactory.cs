@@ -15,6 +15,9 @@ namespace Mochineko.LLMAgent.Operation
         {
             var transitionMapBuilder = TransitionMapBuilder<AgentEvent, AgentContext>
                 .Create<AgentIdleState>();
+            
+            transitionMapBuilder.RegisterTransition<AgentIdleState, AgentSpeakingState>(AgentEvent.BeginSpeaking);
+            transitionMapBuilder.RegisterTransition<AgentSpeakingState, AgentIdleState>(AgentEvent.FinishSpeaking);
 
             var initializeResult = await FiniteStateMachine<AgentEvent, AgentContext>.CreateAsync(
                 transitionMapBuilder.Build(),

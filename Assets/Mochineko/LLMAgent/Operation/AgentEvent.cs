@@ -3,6 +3,7 @@ namespace Mochineko.LLMAgent.Operation
 {
     internal enum AgentEvent
     {
-        
+        BeginSpeaking,
+        FinishSpeaking,
     }
 }

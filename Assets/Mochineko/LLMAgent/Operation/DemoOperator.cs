@@ -1,13 +1,11 @@
 #nullable enable
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.ChatGPT_API;
 using Mochineko.FacialExpressions.Blink;
 using Mochineko.FacialExpressions.Emotion;
-using Mochineko.FacialExpressions.Extensions.VOICEVOX;
 using Mochineko.FacialExpressions.Extensions.VRM;
 using Mochineko.FacialExpressions.LipSync;
 using Mochineko.FacialExpressions.Samples;
@@ -21,7 +19,6 @@ using Mochineko.Relent.Result;
 using Mochineko.RelentStateMachine;
 using Mochineko.VOICEVOX_API.QueryCreation;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UniVRM10;
 using VRMShaders;
 
@@ -38,10 +35,7 @@ namespace Mochineko.LLMAgent.Operation
         [SerializeField] private float emotionFollowingTime = 1f;
         [SerializeField] private float emotionWeight = 1f;
         [SerializeField] private AudioSource? audioSource = null;
-
-        private readonly ConcurrentQueue<SpeechCommand> speechQueue = new();
-
-        private AudioClip? currentClip;
+        [SerializeField] private RuntimeAnimatorController? animatorController = null;
 
         private IChatMemoryStore? store;
         private LongTermChatMemory? memory;
@@ -49,25 +43,50 @@ namespace Mochineko.LLMAgent.Operation
         private ChatCompletion? chatCompletion;
         private ChatCompletion? stateCompletion;
         private VoiceVoxSpeechSynthesis? speechSynthesis;
-        private IFiniteStateMachine<AgentEvent, AgentContext>? stateMachine;
-
-        private ILipMorpher? lipMorpher;
-        private ILipAnimator? lipAnimator;
-        private IEmotionMorpher<FacialExpressions.Emotion.Emotion>? emotionMorpher;
-        private ExclusiveFollowingEmotionAnimator<FacialExpressions.Emotion.Emotion>? emotionAnimator;
-
-        private void Awake()
-        {
-            Assert.IsNotNull(audioSource);
-        }
+        private IFiniteStateMachine<AgentEvent, AgentContext>? agentStateMachine;
 
         private async void Start()
         {
+            await SetupAgentAsync(this.GetCancellationTokenOnDestroy());
+        }
+
+        private async void Update()
+        {
+            if (agentStateMachine == null)
+            {
+                return;
+            }
+
+            var updateResult = await agentStateMachine
+                .UpdateAsync(this.GetCancellationTokenOnDestroy());
+            if (updateResult is IFailureResult updateFailure)
+            {
+                Debug.LogError($"Failed to update agent state machine because -> {updateFailure.Message}.");
+            }
+        }
+
+        private void OnDestroy()
+        {
+            agentStateMachine?.Dispose();
+        }
+
+        private async UniTask SetupAgentAsync(CancellationToken cancellationToken)
+        {
+            if (audioSource == null)
+            {
+                throw new NullReferenceException(nameof(audioSource));
+            }
+
+            if (animatorController == null)
+            {
+                throw new NullReferenceException(nameof(animatorController));
+            }
+
             var apiKeyPath = Path.Combine(
                 Application.dataPath,
                 "Mochineko/LLMAgent/Operation/OpenAI_API_Key.txt");
 
-            var apiKey = await File.ReadAllTextAsync(apiKeyPath);
+            var apiKey = await File.ReadAllTextAsync(apiKeyPath, cancellationToken);
             if (string.IsNullOrEmpty(apiKey))
             {
                 throw new Exception($"[LLMAgent.Operation] Loaded API Key is empty from path:{apiKeyPath}");
@@ -81,7 +100,7 @@ namespace Mochineko.LLMAgent.Operation
                 apiKey,
                 model,
                 store,
-                this.GetCancellationTokenOnDestroy());
+                cancellationToken);
 
             chatCompletion = new ChatCompletion(
                 apiKey,
@@ -99,7 +118,7 @@ namespace Mochineko.LLMAgent.Operation
                     {
                         await memory.AddMessageAsync(
                             successResult.Result.Conversations[i],
-                            this.GetCancellationTokenOnDestroy());
+                            cancellationToken);
                     }
                 }
                 else if (conversationsDeserializeResult is IFailureResult<ConversationCollection> failureResult)
@@ -113,17 +132,17 @@ namespace Mochineko.LLMAgent.Operation
 
             var binary = await File.ReadAllBytesAsync(
                 vrmAvatarPath,
-                this.GetCancellationTokenOnDestroy());
+                cancellationToken);
 
             var instance = await LoadVRMAsync(
                 binary,
-                this.GetCancellationTokenOnDestroy());
+                cancellationToken);
 
-            lipMorpher = new VRMLipMorpher(instance.Runtime.Expression);
-            lipAnimator = new FollowingLipAnimator(lipMorpher);
+            var lipMorpher = new VRMLipMorpher(instance.Runtime.Expression);
+            var lipAnimator = new FollowingLipAnimator(lipMorpher);
 
-            emotionMorpher = new VRMEmotionMorpher(instance.Runtime.Expression);
-            emotionAnimator = new ExclusiveFollowingEmotionAnimator<FacialExpressions.Emotion.Emotion>(
+            var emotionMorpher = new VRMEmotionMorpher(instance.Runtime.Expression);
+            var emotionAnimator = new ExclusiveFollowingEmotionAnimator<FacialExpressions.Emotion.Emotion>(
                 emotionMorpher,
                 followingTime: emotionFollowingTime);
 
@@ -137,55 +156,19 @@ namespace Mochineko.LLMAgent.Operation
 
             var agentContext = new AgentContext(
                 eyelidAnimator,
-                eyelidAnimationFrames);
+                eyelidAnimationFrames,
+                lipMorpher,
+                lipAnimator,
+                audioSource,
+                emotionAnimator);
 
-            stateMachine = await AgentStateMachineFactory.CreateAsync(
+            agentStateMachine = await AgentStateMachineFactory.CreateAsync(
                 agentContext,
-                this.GetCancellationTokenOnDestroy());
-        }
+                cancellationToken);
 
-        private async void Update()
-        {
-            if (stateMachine == null)
-            {
-                return;
-            }
-            
-            emotionAnimator?.Update();
-            
-            var updateResult = await stateMachine
-                .UpdateAsync(this.GetCancellationTokenOnDestroy());
-            if (updateResult is IFailureResult updateFailure)
-            {
-                Debug.LogError($"Failed to update agent state machine because -> {updateFailure.Message}.");
-                return;
-            }
-
-            if (audioSource == null)
-            {
-                throw new NullReferenceException(nameof(audioSource));
-            }
-
-            if (audioSource.isPlaying)
-            {
-                return;
-            }
-
-            if (speechQueue.TryDequeue(out var command))
-            {
-                BeginSpeechAsync(command, this.GetCancellationTokenOnDestroy())
-                    .Forget();
-            }
-        }
-
-        private void OnDestroy()
-        {
-            stateMachine?.Dispose();
-            if (currentClip != null)
-            {
-                Destroy(currentClip);
-                currentClip = null;
-            }
+            instance
+                .GetComponent<Animator>()
+                .runtimeAnimatorController = animatorController;
         }
 
         // ReSharper disable once InconsistentNaming
@@ -205,22 +188,6 @@ namespace Mochineko.LLMAgent.Operation
             );
         }
 
-        public async UniTask AnimateLipAsync(
-            AudioQuery audioQuery,
-            CancellationToken cancellationToken)
-        {
-            if (lipAnimator == null)
-            {
-                return;
-            }
-
-            var lipFrames = AudioQueryConverter
-                .ConvertToSequentialAnimationFrames(audioQuery);
-
-            await lipAnimator
-                .AnimateAsync(lipFrames, cancellationToken);
-        }
-
         [ContextMenu(nameof(StartChatAsync))]
         public void StartChatAsync()
         {
@@ -238,6 +205,11 @@ namespace Mochineko.LLMAgent.Operation
             if (speechSynthesis == null)
             {
                 throw new NullReferenceException(nameof(speechSynthesis));
+            }
+
+            if (agentStateMachine == null)
+            {
+                throw new NullReferenceException(nameof(agentStateMachine));
             }
 
             string chatResponse;
@@ -287,17 +259,30 @@ namespace Mochineko.LLMAgent.Operation
 
             var synthesisResult = await speechSynthesis.SynthesisSpeechAsync(
                 HttpClientPool.PooledClient,
-                chatResponse,
+                emotionalMessage.Message,
                 cancellationToken);
 
             switch (synthesisResult)
             {
                 case ISuccessResult<(AudioQuery query, AudioClip clip)> synthesisSuccess:
                 {
-                    speechQueue.Enqueue(new SpeechCommand(
+                    agentStateMachine.Context.SpeechQueue.Enqueue(new SpeechCommand(
                         synthesisSuccess.Result.query,
                         synthesisSuccess.Result.clip,
                         new EmotionSample<FacialExpressions.Emotion.Emotion>(emotion, emotionWeight)));
+
+                    if (agentStateMachine.IsCurrentState<AgentIdleState>())
+                    {
+                        var sendEventResult = await agentStateMachine.SendEventAsync(
+                            AgentEvent.BeginSpeaking,
+                            cancellationToken);
+                        if (sendEventResult is IFailureResult sendEventFailure)
+                        {
+                            Debug.LogError(
+                                $"[LLMAgent.Operation] Failed to send event because of {sendEventFailure.Message}.");
+                        }
+                    }
+
                     break;
                 }
 
@@ -311,42 +296,6 @@ namespace Mochineko.LLMAgent.Operation
                 default:
                     return;
             }
-        }
-
-        private async UniTask BeginSpeechAsync(
-            SpeechCommand command,
-            CancellationToken cancellationToken)
-        {
-            if (audioSource == null)
-            {
-                throw new NullReferenceException(nameof(audioSource));
-            }
-
-            if (lipAnimator == null)
-            {
-                throw new NullReferenceException(nameof(lipAnimator));
-            }
-
-            if (currentClip != null)
-            {
-                Destroy(currentClip);
-            }
-
-            currentClip = command.AudioClip;
-            audioSource.clip = currentClip;
-            audioSource.Play();
-
-            emotionAnimator?.Emote(command.Emotion);
-
-            var lipFrames = AudioQueryConverter
-                .ConvertToSequentialAnimationFrames(command.AudioQuery);
-
-            await lipAnimator.AnimateAsync(
-                lipFrames,
-                cancellationToken);
-
-            emotionMorpher?.Reset();
-            lipMorpher?.Reset();
         }
     }
 }

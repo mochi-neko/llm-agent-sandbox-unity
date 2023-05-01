@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.Relent.Result;
 using Mochineko.RelentStateMachine;
+using UnityEngine;
 
 namespace Mochineko.LLMAgent.Operation
 {
@@ -14,6 +15,8 @@ namespace Mochineko.LLMAgent.Operation
             AgentContext context,
             CancellationToken cancellationToken)
         {
+            Debug.Log($"[LLMAgent.Operation] Enter {nameof(AgentIdleState)}.");
+            
             eyelidAnimationCanceller?.Cancel();
             eyelidAnimationCanceller = new CancellationTokenSource();
             
@@ -31,6 +34,8 @@ namespace Mochineko.LLMAgent.Operation
             AgentContext context,
             CancellationToken cancellationToken)
         {
+            context.EmotionAnimator.Update();
+            
             return UniTask.FromResult<IResult<IEventRequest<AgentEvent>>>(
                 StateResultsExtension<AgentEvent>.Succeed);
         }
@@ -39,7 +44,10 @@ namespace Mochineko.LLMAgent.Operation
             AgentContext context,
             CancellationToken cancellationToken)
         {
+            Debug.Log($"[LLMAgent.Operation] Exit {nameof(AgentIdleState)}.");
+            
             eyelidAnimationCanceller?.Cancel();
+            eyelidAnimationCanceller = null;
             
             return UniTask.FromResult<IResult>(
                 Results.Succeed());

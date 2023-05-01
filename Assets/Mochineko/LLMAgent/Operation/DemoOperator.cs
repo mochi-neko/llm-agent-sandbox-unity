@@ -195,7 +195,7 @@ namespace Mochineko.LLMAgent.Operation
                 .Forget();
         }
 
-        private async UniTask ChatAsync(string message, CancellationToken cancellationToken)
+        public async UniTask ChatAsync(string message, CancellationToken cancellationToken)
         {
             if (chatCompletion == null)
             {

@@ -66,7 +66,7 @@ namespace Mochineko.LLMAgent.Operation
                         return UniTask.FromResult<IResult<IEventRequest<AgentEvent>>>(
                             StateResultsExtension<AgentEvent>.Succeed);
                     }
-                    catch (OperationCanceledException exception)
+                    catch (OperationCanceledException)
                     {
                         return UniTask.FromResult<IResult<IEventRequest<AgentEvent>>>(
                             StateResults.SucceedAndRequest(AgentEvent.FinishSpeaking));

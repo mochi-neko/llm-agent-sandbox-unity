@@ -43,6 +43,8 @@ namespace Mochineko.LLMAgent.Operation
                         messageInput.text,
                         this.GetCancellationTokenOnDestroy()
                     );
+                    
+                    messageInput.text = string.Empty;
                 })
                 .AddTo(this);
         }

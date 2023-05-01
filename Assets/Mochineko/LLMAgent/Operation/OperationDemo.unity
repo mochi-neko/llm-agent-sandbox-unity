@@ -959,7 +959,7 @@ MonoBehaviour:
   message: "\u4ECA\u65E5\u306F\u3044\u3044\u5929\u6C17\u3067\u3059\u306D\u3002"
   speakerID: 0
   vrmAvatarPath: /Users/masaki/Documents/uchinoko_dress.vrm
-  emotionFollowingTime: 0.2
+  emotionFollowingTime: 0.1
   emotionWeight: 0.2
   audioSource: {fileID: 943789996}
   animatorController: {fileID: 9100000, guid: d41e159605de3433a9f0aa1cc1943c19, type: 2}

@@ -9,8 +9,15 @@ namespace Mochineko.LLMAgent.Operation
             " The emotion value should be another JSON object with keys:" +
             " happiness, sadness, anger, fear, surprise and disgust." +
             " Each value should be a number between 0 and 1." +
-            " The message value should be a string." +
-            " You must responde only JSON string.";
+            " The message value should be a string and in language of user message." +
+            " Example:" +
+            " user message: こんにちは、今日はいい天気ですね。," +
+            " your response:" +
+            " {" +
+            "   emotion: {\"happiness\": 0.8, \"sadness\": 0, \"anger\": 0, \"fear\": 0, \"surprise\": 0, \"disgust\": 0}" +
+            "   message: こんにちは、お天気がいいと気持ちがいいですね。" +
+            " }." +
+            " You must responde only above JSON string.";
 
         public const string StateResponseWithZeroShot =
             "You are a human that has human body and emotion." +
